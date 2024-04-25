@@ -355,6 +355,8 @@
 
         let timerData = JSON.parse(localStorage.getItem('timerData')) || [];
 
+        var audio = new Audio('water-drop.mp3');
+
 
 
 
@@ -409,7 +411,7 @@
                 timeLeft = minutes * 60;
             }
             let startTimer = new Date();
-            let tmp = startTimer.getFullYear()+'-'+(startTimer.getMonth()+1)+'-'+startTimer.getDate()+' '+startTimer.getHours()+':'+startTimer.getMinutes()+':'+startTimer.getSeconds();
+            let tmp = startTimer.getFullYear() + '-' + (startTimer.getMonth() + 1) + '-' + startTimer.getDate() + ' ' + startTimer.getHours() + ':' + startTimer.getMinutes() + ':' + startTimer.getSeconds();
             var data = {
                 'startDateTimer': tmp,
                 'totalPomodoroTime': 0,
@@ -419,7 +421,7 @@
             // If the timer is not paused and countdown is undefined (i.e., the timer is starting for the first time), save the start time
             if (!isPaused && countdown === null) {
                 let startTimer = new Date();
-                let tmp = startTimer.getFullYear()+'-'+(startTimer.getMonth()+1)+'-'+startTimer.getDate()+' '+startTimer.getHours()+':'+startTimer.getMinutes()+':'+startTimer.getSeconds();
+                let tmp = startTimer.getFullYear() + '-' + (startTimer.getMonth() + 1) + '-' + startTimer.getDate() + ' ' + startTimer.getHours() + ':' + startTimer.getMinutes() + ':' + startTimer.getSeconds();
                 localStorage.setItem('startTimer', tmp);
 
                 // Push the new object to the timerData array
@@ -458,7 +460,8 @@
                 // If time runs out, stop the timer
                 if (timeLeft <= 0) {
                     clearInterval(countdown);
-                    alert('Time is up!');
+                    showAlert('Well done :)');
+                    audio.play();
                 }
 
                 // Save timeLeft and isPaused to localStorage
@@ -635,6 +638,7 @@
                     .then(data => {
                         if (data.status === 'success :)') {
                             console.log('Data successfully sent to the server!');
+                            localStorage.removeItem('timerData');
                         } else {
                             console.log('An error occurred: ' + data.message);
                         }
@@ -748,6 +752,19 @@
                         reject(error);
                     });
             });
+        }
+
+        var span = document.getElementById('close');
+
+        // When the user clicks on <span> (x), close the alert box
+        span.onclick = function () {
+            alertBox.style.display = 'none';
+        }
+
+        // Function to show the custom alert box
+        function showAlert(message) {
+            document.getElementById('alertMessage').innerText = message;
+            alertBox.style.display = 'block';
         }
 
     </script>
