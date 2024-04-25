@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css
+    ">
+    <title>Timer</title>
+    <style>
+        /* CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+
+        html {
+            background-image: url(OIG4.jpg);
+            background-repeat: space;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: nowrap;
+            height: 100vh;
+        }
+
+        #timer {
+            padding: 0.2em;
+            border: 3px solid black;
+            font-size: 5em;
+            user-select: none;
+            background-color: rgba(255, 255, 255, 70%);
+            border-radius: 0.2em;
+        }
+
+        #start {
+            margin-top: 0.5em;
+            border: 3px solid black;
+            font-size: 2em;
+            width: 2em;
+        }
+
+
+        .active {
+            background-color: rgba(255, 148, 112, 80%) !important;
+        }
+
+        #gif {
+            display: block;
+            border: 2px solid black;
+            margin-top: 2vh;
+        }
+
+        #reset {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border: 3px solid black;
+            font-size: 2em;
+            height: fit-content;
+            margin-top: 1vh;
+            margin-left: 1vh;
+            border-radius: 30%;
+            line-height: 0.9em;
+            padding: 0.1em;
+        }
+
+        #reset:active {
+            background-color: rgba(255, 99, 71, 80%);
+        }
+
+        #buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2em;
+        }
+
+        #top-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2em;
+            margin-bottom: 1em;
+        }
+
+        #send {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            margin: 1vh;
+            padding: 0.5em;
+            display: block;
+            border: 3px solid black;
+            font-size: 1em;
+            border-radius: 0.5em;
+        }
+
+        #alertBox {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        #alertBox div {
+            background-color: #fefefe;
+            margin: 20% auto;
+            padding: 2em;
+            border: 2px solid black;
+            width: 80%;
+            height: 50vh;
+        }
+
+        #close {
+            color: black;
+            float: right;
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #alertMessage {
+            font-size: 3em;
+            font-weight: 600;
+            text-align: center;
+            transform: translateY(50%);
+        }
+
+        .roboto-regular {
+            font-family: "Roboto", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .top-button {
+            border: 3px solid black;
+            font-size: 1em;
+            border-radius: 0.5em;
+            height: 2em;
+            width: 6em;
+            background-color: rgba(255, 255, 255, 80%);
+        }
+
+        .button {
+            border: 3px solid black;
+            border-radius: 0.2em;
+            background-color: rgba(255, 255, 255, 80%);
+        }
+
+        #settings {
+            font-family: Verdana, sans-serif;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            font-size: 2em;
+            font-weight: 900;
+            background-color: transparent;
+            cursor: pointer;
+            text-align: center;
+            border: 0px solid transparent;
+        }
+
+        #settings svg {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 1.5em;
+            width: auto;
+            margin-top: 0.2em;
+            margin-right: 0.2em;
+            background-color: rgba(255, 255, 255, 40%);
+            border: 3px solid black;
+            border-radius: 50%;
+        }
+
+        .settings-popup {
+            position: fixed;
+            width: 80vw;
+            height: 60vh;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 2em;
+            padding: 2%;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+            border: 2px solid black;
+            display: none;
+            opacity: 0.98;
+            font-family: Verdana, sans-serif;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+            z-index: 90;
+        }
+
+        .settings-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2em;
+            user-select: none;
+        }
+
+        .settings-item label {
+            margin-bottom: 0.2em;
+        }
+
+        .settings-item input {
+            margin-bottom: 5px;
+        }
+
+        .top-label {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .bottom-label {
+            font-size: 0.8em;
+        }
+
+
+        #close-settings-btn {
+            position: sticky;
+            top: 0;
+            left: 97%;
+            height: auto;
+            width: auto;
+            font-size: 200%;
+            cursor: pointer;
+            font-weight: 900;
+            background-color: transparent;
+            border: 1px solid transparent;
+        }
+
+        #reset-all {
+            color: red;
+            border: 3px solid red;
+        }
+
+        #save {
+            float: right;
+        }
+
+        .active-session-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <button id="reset" class="button"><i class="fa-solid fa-rotate-left"></i></button>
+        <div id="top-buttons">
+            <button id="pomodoro" class="top-button">session</button>
+            <button id="short-break" class="top-button">short break</button>
+            <button id="long-break" class="top-button">long break</button>
+        </div>
+        <div id="timer" class="timer roboto-regular">25:00</div>
+        <div id="buttons">
+            <button id="start" class="button"><i class="fa-solid fa-play"></i></button>
+        </div>
+        <button id="send" class="button"><i class="fa-solid fa-database"></i></button>
+    </div>
+
+    <div id="settings">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M14 21h-4l-.551-2.48a6.991 6.991 0 0 1-1.819-1.05l-2.424.763-2-3.464 1.872-1.718a7.055 7.055 0 0 1 0-2.1L3.206 9.232l2-3.464 2.424.763A6.992 6.992 0 0 1 9.45 5.48L10 3h4l.551 2.48a6.992 6.992 0 0 1 1.819 1.05l2.424-.763 2 3.464-1.872 1.718a7.05 7.05 0 0 1 0 2.1l1.872 1.718-2 3.464-2.424-.763a6.99 6.99 0 0 1-1.819 1.052L14 21z" />
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+        </svg>
+    </div>
+    <div id="settings-popup" class="settings-popup">
+        <button id="close-settings-btn">x</button>
+
+        <div class="settings-item">
+            <label for="session-minutes" class="top-label">Session</label>
+            <input type="text" id="session-minutes" name="minutes">
+            <label for="session-minutes" class="bottom-label">minutes</label>
+        </div>
+
+        <div class="settings-item">
+            <label for="shortBreak-minutes" class="top-label">Short break</label>
+            <input type="text" id="shortBreak-minutes" name="minutes">
+            <label for="shortBreak-minutes" class="bottom-label">minutes</label>
+        </div>
+
+        <div class="settings-item">
+            <label for="longBreak-minutes" class="top-label">Long break</label>
+            <input type="text" id="longBreak-minutes" name="minutes">
+            <label for="longBreak-minutes" class="bottom-label">minutes</label>
+        </div>
+
+        <button id="reset-all" class="top-button">Reset all</button>
+        <button id="save" class="top-button">Save</button>
+
+
+    </div>
+
+    <div id="alertBox">
+        <div>
+            <span id="close">&times;</span>
+            <p id="alertMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        var timerElement = document.getElementById('timer');
+        var countdown; // Declare countdown variable outside the function
+        var isPaused = false; // Declare a variable to check if the timer is paused
+        var pauseCounter = 0;
+        var startDate = 0
+        var elapsedSecondsTotal = 0; // Add this line at the beginning of your script
+        let isWorkSession = false;
+        var currentBreakType = 'short';
+
+        var startButton = document.getElementById('start');
+        var resetButton = document.getElementById('reset');
+        var sendButton = document.getElementById('send');
+        var shortBreak = document.getElementById('short-break');
+        var longBreak = document.getElementById('long-break');
+        const settings = document.querySelector('#settings');
+        const closeSettingsBtn = document.querySelector('#close-settings-btn');
+        var sessionInput = document.getElementById('session-minutes');
+        var shortBreakInput = document.getElementById('shortBreak-minutes');
+        var longBreakInput = document.getElementById('longBreak-minutes');
+        var pomodoroButton = document.getElementById('pomodoro');
+        var shortBreakButton = document.getElementById('short-break');
+        var longBreakButton = document.getElementById('long-break');
+
+        sessionInput.value = localStorage.getItem('sessionMinutes');;
+        shortBreakInput.value = localStorage.getItem('shortBreakMinutes');;
+        longBreakInput.value = localStorage.getItem('longBreakMinutes');;
+
+
+        var alertBox = document.getElementById('alertBox');
+        var span = document.getElementById('close');
+        var audio = new Audio('water-drop.mp3'); // replace with the URL of your sound file
+
+        // When the user clicks on <span> (x), close the alert box
+        span.onclick = function () {
+            alertBox.style.display = 'none';
+        }
+
+        var totalWorkMinutes = parseInt(localStorage.getItem('totalWorkMinutes')) || 0;
+
+        // Retrieve timeLeft from localStorage or set to sessionMinutes * 60 if not found
+        var timeLeft = localStorage.getItem('timeLeft') ? parseInt(localStorage.getItem('timeLeft')) : localStorage.getItem('sessionMinutes') * 60;
+
+        // Update timer display on page load
+        timerElement.innerHTML = formatTime(timeLeft);
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var sessionMinutes = localStorage.getItem('sessionMinutes');
+            var shortBreakMinutes = localStorage.getItem('shortBreakMinutes');
+            var longBreakMinutes = localStorage.getItem('longBreakMinutes');
+
+            if (sessionMinutes) {
+                document.getElementById('session-minutes').value = sessionMinutes;
+            }
+            if (shortBreakMinutes) {
+                document.getElementById('shortBreak-minutes').value = shortBreakMinutes;
+            }
+            if (longBreakMinutes) {
+                document.getElementById('longBreak-minutes').value = longBreakMinutes;
+            }
+        });
+
+
+
+        function startTimer(button, isButtonClicked) {
+            button.classList.remove('active');
+            timerElement.classList.remove('active');
+            var startDate = new Date();
+
+            var startDateOnDB = startDate.getFullYear() + '-' +
+                ('0' + (startDate.getMonth() + 1)).slice(-2) + '-' +
+                ('0' + startDate.getDate()).slice(-2) + ' ' +
+                ('0' + startDate.getHours()).slice(-2) + ':' +
+                ('0' + startDate.getMinutes()).slice(-2) + ':' +
+                ('0' + startDate.getSeconds()).slice(-2);
+
+
+            localStorage.setItem('startDateTime', startDateOnDB);
+            // Check if countdown is already set
+            if (countdown && !isPaused) {
+                button.classList.toggle('active');
+                timerElement.classList.toggle('active');
+                clearInterval(countdown); // Pause the timer
+                countdown = null;
+                isPaused = true;
+                if (!isButtonClicked) { // Only increase the pause counter if a session or break button was not clicked
+                    pauseCounter++;
+                    localStorage.setItem('pauseCount', pauseCounter);
+                }
+                button.innerHTML = '<i class="fa-solid fa-play"></i>'; // Change button text to 'Resume'
+                return;
+            }
+
+
+            isPaused = false;
+            button.innerHTML = '<i class="fa-solid fa-pause"></i>'; // Change button text to 'Pause'
+
+            countdown = setInterval(function () {
+                var now = new Date();
+                var elapsedSeconds = Math.floor((now - startDate) / 1000);
+                elapsedSecondsTotal += elapsedSeconds;
+                timeLeft = timeLeft - elapsedSeconds;
+                startDate = now;
+
+                // Store timeLeft in localStorage
+                localStorage.setItem('timeLeft', timeLeft);
+
+                timerElement.innerHTML = formatTime(timeLeft);
+
+                if (isWorkSession) {
+                    var minutesElapsed = Math.floor(elapsedSecondsTotal / 60);
+                    if (minutesElapsed > totalWorkMinutes) {
+                        totalWorkMinutes = minutesElapsed;
+                        localStorage.setItem('totalWorkMinutes', totalWorkMinutes);
+                    }
+                    elapsedSecondsTotal %= 60;
+                }
+
+
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    showAlert('Well done :)');
+                    audio.play();
+                    if (isWorkSession) {
+                        totalWorkMinutes += Math.floor((startDate.getTime() - new Date(localStorage.getItem('startDateTime')).getTime()) / (1000 * 60));
+                    }
+                    if (currentBreakType === 'short') {
+                        timeLeft = shortBreakInput.value * 60;
+                    } else {
+                        timeLeft = longBreakInput.value * 60;
+                    }
+                    timerElement.innerHTML = formatTime(timeLeft);
+                    countdown = null; // Clear the interval ID when the timer resets
+                    startButton.innerHTML = '<i class="fa-solid fa-play"></i>'; // Change button text back to 'Start'
+                    localStorage.removeItem('timeLeft'); // Remove timeLeft from localStorage
+                }
+            }, 1000);
+        }
+
+
+        // Attach the event listeners
+        startButton.addEventListener('click', function () {
+            startTimer(startButton, false);
+        });
+
+        resetButton.addEventListener('click', function () {
+            clearInterval(countdown);
+            countdown = null;
+            if (isWorkSession) {
+                timeLeft = sessionInput.value * 60;
+            } else if (currentBreakType === 'short') {
+                timeLeft = shortBreakInput.value * 60;
+            } else {
+                timeLeft = longBreakInput.value * 60;
+            }
+            timerElement.innerHTML = formatTime(timeLeft);
+            startButton.innerHTML = '<i class="fa-solid fa-play"></i>'; // Change button text back to 'Start'
+            localStorage.removeItem('timeLeft'); // Remove timeLeft from localStorage
+            startButton.classList.remove('active');
+            timerElement.classList.remove('active');
+        });
+
+        sendButton.addEventListener('click', function () {
+            // Get the data from localStorage
+            var startDateOnDB = localStorage.getItem('startDateTime');
+            var workMinutes = parseInt(localStorage.getItem('totalWorkMinutes'));
+            var pauseCount = parseInt(localStorage.getItem('pauseCount'));
+
+            workMinutes = workMinutes ? parseInt(workMinutes) : 0;
+            pauseCount = pauseCount ? parseInt(pauseCount) : 0;
+
+            // Create an object with the data
+            var data = {
+                'startDateTime': startDateOnDB.toString(),
+                'workMinutes': parseInt(workMinutes),
+                'pauseCount': parseInt(pauseCount)
+            };
+
+            console.log(data);
+
+            // Send a POST request to your server
+            fetch('https://483d8b.pythonanywhere.com/addTime', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success :)') {
+                        console.log('Data successfully sent to the server!');
+                        localStorage.removeItem('totalWorkMinutes');
+                        localStorage.removeItem('pauseCount');
+                        localStorage.removeItem('startDateOnDB');
+                    } else {
+                        console.log('An error occurred: ' + data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error Stack:', error.stack);
+                });
+        });
+
+        settings.addEventListener('click', function () {
+            document.querySelector('#settings-popup').style.display = 'block';
+        });
+
+        closeSettingsBtn.addEventListener('click', function () {
+            document.querySelector('#settings-popup').style.display = 'none';
+        });
+
+
+        function formatTime(seconds) {
+            var minutes = Math.floor(seconds / 60);
+            var seconds = seconds % 60;
+            return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+        }
+
+
+        // Function to show the custom alert box
+        function showAlert(message) {
+            document.getElementById('alertMessage').innerText = message;
+            alertBox.style.display = 'block';
+        }
+
+
+        pomodoroButton.addEventListener('click', function () {
+            clearInterval(countdown);
+            timeLeft = sessionInput.value * 60;
+            timerElement.innerHTML = formatTime(timeLeft);
+            isWorkSession = true;
+            startButton.innerHTML = '<i class="fa-solid fa-play"></i>';
+            startButton.classList.remove('active');
+            timerElement.classList.remove('active');
+            startDate = new Date();
+            isPaused = true;
+            highlightActiveButton(this);
+        });
+
+        shortBreakButton.addEventListener('click', function () {
+            clearInterval(countdown);
+            timeLeft = shortBreakInput.value * 60;
+            timerElement.innerHTML = formatTime(timeLeft);
+            isWorkSession = false;
+            elapsedSecondsTotal = 0;
+            startButton.innerHTML = '<i class="fa-solid fa-play"></i>';
+            startButton.classList.remove('active');
+            timerElement.classList.remove('active');
+            startDate = new Date();
+            isPaused = true;
+            currentBreakType = 'short';
+            highlightActiveButton(this);
+        });
+
+        longBreakButton.addEventListener('click', function () {
+            clearInterval(countdown);
+            timeLeft = longBreakInput.value * 60;
+            timerElement.innerHTML = formatTime(timeLeft);
+            isWorkSession = false;
+            elapsedSecondsTotal = 0;
+            startButton.innerHTML = '<i class="fa-solid fa-play"></i>';
+            startButton.classList.remove('active');
+            timerElement.classList.remove('active');
+            startDate = new Date();
+            isPaused = true;
+            currentBreakType = 'long';
+            highlightActiveButton(this);
+        });
+
+        document.getElementById('save').addEventListener('click', function () {
+            var sessionMinutes = document.getElementById('session-minutes').value;
+            var shortBreakMinutes = document.getElementById('shortBreak-minutes').value;
+            var longBreakMinutes = document.getElementById('longBreak-minutes').value;
+
+            localStorage.setItem('sessionMinutes', sessionMinutes);
+            localStorage.setItem('shortBreakMinutes', shortBreakMinutes);
+            localStorage.setItem('longBreakMinutes', longBreakMinutes);
+
+            // Check the current session type and set timeLeft accordingly
+            if (isWorkSession) {
+                timeLeft = sessionInput.value * 60;
+            } else {
+                // Check if it's a short break or a long break
+                timeLeft = (currentBreakType === 'short') ? shortBreakInput.value * 60 : longBreakInput.value * 60;
+            }
+
+            timerElement.innerHTML = formatTime(timeLeft);
+            this.innerHTML = 'saved :)';
+            setTimeout(() => {
+                this.textContent = "Save";
+                document.querySelector('#settings-popup').style.display = 'none';
+            }, 1000);
+        });
+
+
+        document.getElementById('reset-all').addEventListener('click', function () {
+            localStorage.removeItem('timeLeft');
+            localStorage.removeItem('totalWorkMinutes');
+            localStorage.removeItem('pauseCount');
+            localStorage.removeItem('startDateTime');
+            localStorage.removeItem('startDateOnDB');
+
+            sessionInput.value = 25;
+            shortBreakInput.value = 5;
+            longBreakInput.value = 10;
+
+            // Check the current session type and set timeLeft accordingly
+            if (isWorkSession) {
+                timeLeft = sessionInput.value * 60;
+                timerElement.innerHTML = formatTime(timeLeft);
+            } else {
+                // Check if it's a short break or a long break
+                timeLeft = (currentBreakType === 'short') ? shortBreakInput.value * 60 : longBreakInput.value * 60;
+                timerElement.innerHTML = formatTime(timeLeft);
+            }
+
+
+
+            this.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+            setTimeout(() => {
+                this.textContent = "Reset all";
+                document.querySelector('#settings-popup').style.display = 'none';
+            }, 1000);
+        });
+
+
+        function highlightActiveButton(button) {
+            // Remove the active class from all session buttons
+            pomodoroButton.classList.remove('active-session-button');
+            shortBreakButton.classList.remove('active-session-button');
+            longBreakButton.classList.remove('active-session-button');
+
+            // Add the active class to the specified button
+            button.classList.add('active-session-button');
+        }
+
+    </script>
+
+</body>
+
+</html>
