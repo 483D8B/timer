@@ -151,7 +151,7 @@
         .top-button {
             font-size: 1em;
             height: 2em;
-            width: 6em;
+            width: 5em;
             margin-bottom: 1em;
         }
 
@@ -247,7 +247,7 @@
         #reset-all {
             color: red;
             border: 3px solid red;
-            margin-right: 2em;
+            margin-right: 1em;
         }
 
         #save {
@@ -309,13 +309,17 @@
             <input type="text" id="longBreak-minutes" name="minutes">
             <label for="longBreak-minutes" class="bottom-label">minutes</label>
         </div>
-        <button id="reset-all" class="top-button">Reset all</button>
-        <button id="save" class="top-button">Save</button>
 
         <div class="settings-item">
             <label for="password" class="bottom-label">password</label>
-            <input type="password" id="password">
+            <input type="password" id="password" oninput="checkInput()">
         </div>
+
+
+        <button id="reset-all" class="top-button">Reset all</button>
+        <button id="save" class="top-button">Save</button>
+
+
 
 
     </div>
@@ -367,6 +371,7 @@
             currentMode = localStorage.getItem('currentMode') || 'pomodoro';
             let savedMode = localStorage.getItem('currentMode');
             let savedTimeLeft = Number(localStorage.getItem('timeLeft'));
+            checkInput();
 
             if (savedMode === currentMode && !isNaN(savedTimeLeft)) {
                 // If the saved mode matches the current mode and savedTimeLeft is a number, load the saved timeLeft
@@ -765,6 +770,17 @@
         function showAlert(message) {
             document.getElementById('alertMessage').innerText = message;
             alertBox.style.display = 'block';
+        }
+
+        function checkInput() {
+            var passwordInput = document.getElementById('password').value;
+            var sendButton = document.getElementById('send');
+
+            if (passwordInput.length > 0) {
+                sendButton.disabled = false;
+            } else {
+                sendButton.disabled = true;
+            }
         }
 
     </script>
