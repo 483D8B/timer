@@ -370,7 +370,7 @@
 
         var audio = new Audio('water-drop.mp3');
 
-
+        var noSleep = new NoSleep();
 
 
         document.addEventListener("DOMContentLoaded", (event) => {
@@ -417,9 +417,8 @@
         function startTimer(button) {
 
             // Get the current time
-            let startTime = new Date().getTime();
+            let startTime = Date.now();
 
-            var noSleep = new NoSleep();
 
             // If the timer is not paused, set timeLeft to the current mode's time
             if (!isPaused) {
@@ -450,7 +449,7 @@
             // Start a new interval
             countdown = setInterval(() => {
                 // Calculate the elapsed time in seconds
-                let elapsedTime = Math.floor((new Date().getTime() - startTime) / 1000);
+                let elapsedTime = Math.floor((Date.now() - startTime) / 1000);
 
                 // Update timeLeft
                 timeLeft -= elapsedTime;
@@ -460,7 +459,7 @@
                 }
 
                 // Reset startTime
-                startTime = new Date().getTime();
+                startTime = Date.now();
 
                 // Calculate minutes and seconds from timeLeft
                 let min = Math.floor(timeLeft / 60);
@@ -628,6 +627,8 @@
             startButton.innerHTML = '<i class="fa-solid fa-play"></i>'; // Change button text to 'Start'
             startButton.classList.remove('active');
             document.getElementById('timer').classList.remove('active');
+
+            noSleep.disable();
         }
 
         console.log(JSON.parse(localStorage.getItem('timerData')))
@@ -707,6 +708,9 @@
             timerData = [];
             // Remove timerData from localStorage
             localStorage.removeItem('timerData');
+
+            noSleep.disable();
+
 
             this.innerHTML = '<i class="fa-solid fa-trash-can"></i>...';
 
