@@ -8,6 +8,7 @@
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css
     ">
+    <script src="NoSleep.min.js"></script>
     <title>Timer</title>
     <style>
         /* CSS Reset */
@@ -262,11 +263,11 @@
             text-align: center;
         }
 
-        #reset-all.top-button{
+        #reset-all.top-button {
             width: 5em;
         }
 
-        #save.top-button{
+        #save.top-button {
             width: 5em;
         }
     </style>
@@ -417,6 +418,8 @@
 
             // Get the current time
             let startTime = new Date().getTime();
+
+            var noSleep = new NoSleep();
 
             // If the timer is not paused, set timeLeft to the current mode's time
             if (!isPaused) {
@@ -790,6 +793,11 @@
                 sendButton.disabled = true;
             }
         }
+
+        document.addEventListener('click', function enableNoSleep() {
+            document.removeEventListener('click', enableNoSleep, false);
+            noSleep.enable();
+        }, false);
 
     </script>
 
